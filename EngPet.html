@@ -1060,7 +1060,105 @@ body {
 .minigame-card.theme-writing.unlocked { border-color: rgba(255,159,243,0.5); }
 
 /* Minigames */
-.mg-overlay .tut-card { max-width: 420px; width: 94%; }
+.mg-overlay 
+/* ===== Animated multi-step tutorial ===== */
+.tut-card { max-width: 420px; width: 94%; }
+#tutOverlay .tut-card {
+  background: linear-gradient(165deg, #2d1b4e 0%, #1a0f2e 55%, #12081f 100%);
+  border-radius: 24px;
+  border: 2px solid rgba(196, 77, 255, 0.35);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 40px rgba(196,77,255,0.15);
+  padding: 28px 22px 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: tutCardIn 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+@keyframes tutCardIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.tut-step { display: none; }
+.tut-step.active {
+  display: block;
+  animation: tutStepFade 0.35s ease;
+}
+@keyframes tutStepFade {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.tut-emoji {
+  font-size: 3.4rem;
+  line-height: 1;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4));
+  animation: tutBob 2.4s ease-in-out infinite;
+}
+@keyframes tutBob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-8px) rotate(3deg); }
+}
+.tut-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.45rem;
+  background: linear-gradient(135deg, #ffde59, #ff9ff3, #c44dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+.tut-body {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #d4c4f0;
+  text-align: left;
+  margin: 0 4px 16px;
+}
+.tut-body strong { color: #fff; }
+.tut-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+.tut-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.25s;
+}
+.tut-dot.active {
+  background: var(--duo-green);
+  box-shadow: 0 0 10px rgba(88,204,2,0.6);
+  transform: scale(1.25);
+}
+.tut-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.tut-actions .btn-primary { flex: 1; max-width: 200px; }
+.tut-skip {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 6px;
+}
+.tut-skip:hover { color: #fff; }
+.tut-highlight {
+  display: inline-block;
+  background: rgba(88,204,2,0.15);
+  border: 1px solid rgba(88,204,2,0.35);
+  border-radius: 8px;
+  padding: 2px 8px;
+  color: var(--duo-green);
+  font-weight: 800;
+}
+
 .mg-score-bar {
   display: flex; justify-content: space-between; align-items: center;
   font-weight: 800; font-size: 0.85rem; margin-bottom: 10px;
@@ -4556,15 +4654,74 @@ body {
 </div>
 
 <div class="overlay hidden" id="tutOverlay">
-  <div class="tut-card" style="max-width:400px">
-    <div style="font-size:3rem;margin-bottom:8px">🥚</div>
-    <h2>Welcome to EngPet!</h2>
-    <p style="text-align:left;margin:8px 0 4px"><strong>📚 Learn</strong> — Each section's first lesson is open. Complete lessons in order. New <strong>Writing</strong> unit: tips, then a ~50-word writing marked by AI-style feedback. Short concept pages appear before some lessons.</p>
-    <p style="text-align:left;margin:4px 0"><strong>🐣 Pets</strong> — Earn progress to hatch an egg. Feed, play, wash & sleep so pets stay happy (unhappy pets drain XP!).</p>
-    <p style="text-align:left;margin:4px 0"><strong>🪙 Shop & Gacha</strong> — Spend coins on food, items, boosts, and pet pulls.</p>
-    <p style="text-align:left;margin:4px 0"><strong>🏆 League</strong> — Climb the weekly XP leaderboard.</p>
-    <p style="text-align:left;margin:4px 0 10px"><strong>💬 Chat</strong> — Chat with other learners. Big wins auto-post as achievements that others can heart.</p>
-    <button class="btn-primary" onclick="closeTut()" style="margin-top:8px">Let's Go! 🐣</button>
+  <div class="tut-card" id="tutCard">
+    <!-- Step 0: Welcome -->
+    <div class="tut-step active" data-step="0">
+      <div class="tut-emoji">🥚✨</div>
+      <div class="tut-title">Welcome to EngPet!</div>
+      <div class="tut-body">
+        Learn English, hatch cute pets, and climb the league with friends.<br><br>
+        This quick tour will show you the basics — it only takes a few seconds!
+      </div>
+    </div>
+    <!-- Step 1: Hearts & XP -->
+    <div class="tut-step" data-step="1">
+      <div class="tut-emoji">❤️⚡</div>
+      <div class="tut-title">Hearts & XP</div>
+      <div class="tut-body">
+        <strong>Hearts</strong> are your lives. Answer wrong and you lose one — they refill over time.<br><br>
+        Earn <strong>XP</strong> by completing lessons. Level up to unlock more rewards!
+      </div>
+    </div>
+    <!-- Step 2: Learn path -->
+    <div class="tut-step" data-step="2">
+      <div class="tut-emoji">📚🛤️</div>
+      <div class="tut-title">Your Learning Path</div>
+      <div class="tut-body">
+        Tap the <span class="tut-highlight">Learn</span> tab to see your path.<br><br>
+        Complete lessons in order. Each section has games, reading, listening, and a new <strong>Writing</strong> unit!
+      </div>
+    </div>
+    <!-- Step 3: Pets -->
+    <div class="tut-step" data-step="3">
+      <div class="tut-emoji">🐣💖</div>
+      <div class="tut-title">Hatch & Care for Pets</div>
+      <div class="tut-body">
+        Finish lessons to fill the egg meter and hatch a pet.<br><br>
+        Feed, play, wash and let them sleep — unhappy pets can drain your XP, so keep them happy!
+      </div>
+    </div>
+    <!-- Step 4: Shop -->
+    <div class="tut-step" data-step="4">
+      <div class="tut-emoji">🪙🎁</div>
+      <div class="tut-title">Shop & Gacha</div>
+      <div class="tut-body">
+        Earn <strong>coins</strong> from lessons and spend them on food, toys, boosts, and pet pulls in the Shop.<br><br>
+        Rare pets are waiting for you!
+      </div>
+    </div>
+    <!-- Step 5: Ready -->
+    <div class="tut-step" data-step="5">
+      <div class="tut-emoji">🚀🌟</div>
+      <div class="tut-title">You're Ready!</div>
+      <div class="tut-body">
+        Climb the weekly league, chat with other learners, and collect every pet.<br><br>
+        Pick your level and start your first lesson — good luck!
+      </div>
+    </div>
+
+    <div class="tut-dots" id="tutDots">
+      <div class="tut-dot active"></div>
+      <div class="tut-dot"></div>
+      <div class="tut-dot"></div>
+      <div class="tut-dot"></div>
+      <div class="tut-dot"></div>
+      <div class="tut-dot"></div>
+    </div>
+    <div class="tut-actions">
+      <button class="btn-primary" id="tutNextBtn" onclick="tutNext()">Next →</button>
+    </div>
+    <button class="tut-skip" onclick="closeTut()">Skip tutorial</button>
   </div>
 </div>
 
@@ -7971,7 +8128,61 @@ function startMgFixIt(){
   mgTick(mgRoundSeconds(10),()=>mgLoseLifeOrEnd());
 }
 
-function closeTut(){ $('tutOverlay').classList.add('hidden'); S.tutorialDone = true; save(); }
+let tutStep = 0;
+const TUT_TOTAL = 6;
+
+function showTutStep(n){
+  tutStep = n;
+  const steps = document.querySelectorAll('#tutOverlay .tut-step');
+  steps.forEach(s => s.classList.remove('active'));
+  const cur = document.querySelector('#tutOverlay .tut-step[data-step="'+n+'"]');
+  if(cur) cur.classList.add('active');
+  // dots
+  const dots = document.querySelectorAll('#tutDots .tut-dot');
+  dots.forEach((d,i) => d.classList.toggle('active', i === n));
+  // button text
+  const btn = $('tutNextBtn');
+  if(btn) btn.textContent = (n >= TUT_TOTAL-1) ? "Let's Go! 🐣" : "Next →";
+  // re-trigger card animation lightly
+  const card = $('tutCard');
+  if(card){
+    card.style.animation = 'none';
+    card.offsetHeight; // reflow
+    card.style.animation = 'tutCardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1)';
+  }
+}
+
+function tutNext(){
+  if(tutStep < TUT_TOTAL-1){
+    showTutStep(tutStep + 1);
+  } else {
+    closeTut();
+  }
+}
+
+function closeTut(){
+  const ov = $('tutOverlay');
+  if(ov) ov.classList.add('hidden');
+  S.tutorialDone = true;
+  save();
+  if(currentUser){ try{ cloudSave(); }catch(e){} }
+}
+
+function startTutorial(){
+  tutStep = 0;
+  showTutStep(0);
+  const ov = $('tutOverlay');
+  if(ov) ov.classList.remove('hidden');
+}
+
+function checkTut(){
+  if (!S.tutorialDone) startTutorial();
+  else {
+    const ov = $('tutOverlay');
+    if(ov) ov.classList.add('hidden');
+  }
+}
+
 
 /* ========== FRIENDS SYSTEM ========== */
 let friendsList = [];
